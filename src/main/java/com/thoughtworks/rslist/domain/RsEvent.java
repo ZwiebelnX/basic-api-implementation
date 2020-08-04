@@ -4,14 +4,14 @@ import lombok.Data;
 
 @Data
 public class RsEvent {
-    private String name;
+    private String eventName;
 
     private String key;
 
     public RsEvent(){}
 
-    public RsEvent(String name, String key) {
-        this.name = name;
+    public RsEvent(String eventName, String key) {
+        this.eventName = eventName;
         this.key = key;
     }
 
