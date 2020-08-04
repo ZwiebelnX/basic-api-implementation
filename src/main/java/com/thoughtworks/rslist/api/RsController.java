@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,6 +46,11 @@ public class RsController {
     @PostMapping("rs/list")
     public void addOneRsEvent(@RequestBody RsEvent rsEvent) {
         rsList.add(rsEvent);
+    }
+
+    @PutMapping("rs/list/{index}")
+    public void modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
+        rsList.set(index - 1, rsEvent);
     }
 
     @DeleteMapping("rs/list/{index}")

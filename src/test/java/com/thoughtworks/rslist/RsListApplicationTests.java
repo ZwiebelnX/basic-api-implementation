@@ -75,4 +75,15 @@ class RsListApplicationTests {
             .andExpect(jsonPath("$.key").value("无"));
     }
 
+    @Test
+    void modify_one_event() throws Exception {
+        RsEvent rsEvent = new RsEvent("猪肉涨价了", "社会");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String body = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(put("/rs/list/1").content(body).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        mockMvc.perform(get("/rs/list/1")).andExpect(status().isOk())
+            .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
+            .andExpect(jsonPath("$.key").value("社会"));
+    }
+
 }
