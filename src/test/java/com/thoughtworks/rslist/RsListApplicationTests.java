@@ -27,11 +27,11 @@ class RsListApplicationTests {
         mockMvc.perform(get("/rs/list"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$[0].name").value("第一条事件"))
+            .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
             .andExpect(jsonPath("$[0].key").value("无"))
-            .andExpect(jsonPath("$[1].name").value("第二条事件"))
+            .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
             .andExpect(jsonPath("$[1].key").value("无"))
-            .andExpect(jsonPath("$[2].name").value("第三条事件"))
+            .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
             .andExpect(jsonPath("$[2].key").value("无"));
     }
 
@@ -40,7 +40,7 @@ class RsListApplicationTests {
         mockMvc.perform(get("/rs/list/1"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.name").value("第一条事件"))
+            .andExpect(jsonPath("$.eventName").value("第一条事件"))
             .andExpect(jsonPath("$.key").value("无"));
     }
 
@@ -49,9 +49,9 @@ class RsListApplicationTests {
         mockMvc.perform(get("/rs/list?start=1&end=2"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$[0].name").value("第一条事件"))
+            .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
             .andExpect(jsonPath("$[0].key").value("无"))
-            .andExpect(jsonPath("$[1].name").value("第二条事件"))
+            .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
             .andExpect(jsonPath("$[1].key").value("无"));
     }
 
@@ -63,8 +63,16 @@ class RsListApplicationTests {
         mockMvc.perform(post("/rs/list").content(body).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list/4")).andExpect(status().isOk())
-            .andExpect(jsonPath("$.name").value("猪肉涨价了"))
+            .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
             .andExpect(jsonPath("$.key").value("社会"));
+    }
+
+    @Test
+    void delete_one_event() throws Exception {
+        mockMvc.perform(delete("/rs/list/1")).andExpect(status().isOk());
+        mockMvc.perform(get("/rs/list/1")).andExpect(status().isOk())
+            .andExpect(jsonPath("$.eventName").value("第二条事件"))
+            .andExpect(jsonPath("$.key").value("无"));
     }
 
 }
