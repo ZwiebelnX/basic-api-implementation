@@ -79,7 +79,7 @@ class RsListApplicationTests {
         mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(header().stringValues("index", "3"));
-        mockMvc.perform(get("/rs/list/4"))
+        mockMvc.perform(get("/rs/4"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
             .andExpect(jsonPath("$.keyWord").value("经济"));
