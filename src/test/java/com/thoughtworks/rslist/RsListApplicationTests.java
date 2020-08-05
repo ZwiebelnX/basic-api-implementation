@@ -1,7 +1,9 @@
 package com.thoughtworks.rslist;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ class RsListApplicationTests {
 
     @Autowired
     MockMvc mockMvc;
+
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void contextLoads() throws Exception {
@@ -84,6 +88,13 @@ class RsListApplicationTests {
         mockMvc.perform(get("/rs/list/1")).andExpect(status().isOk())
             .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
             .andExpect(jsonPath("$.key").value("社会"));
+    }
+
+    @Test
+    void should_add_user() throws Exception {
+        User user = new User("Sicong", "male", 22, "sicong.chen@163.com", "15800000000");
+        String requestBody = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
 
 }
