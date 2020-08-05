@@ -48,11 +48,12 @@ public class RsController {
     }
 
     @GetMapping("rs/{index}")
-    public RsEvent getOneRsEvent(@PathVariable Integer index) {
+    public RsEvent getOneRsEvent(@PathVariable Integer index) throws CustomException {
+        checkIndexOutOfBound(index, "invalid index");
         return rsList.get(index - 1);
     }
 
-    @PostMapping("rs")
+    @PostMapping("/rs")
     public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEvent rsEvent) {
         rsList.add(rsEvent);
         UserController.registerUser(rsEvent.getUser());
