@@ -110,4 +110,12 @@ class RsListApplicationTests {
             .andExpect(jsonPath("$.keyWord").value("无"));
     }
 
+
+    @Test
+    void should_throw_error_when_get_list_given_wrong_index() throws Exception {
+        mockMvc.perform(get("/rs/list?start=-1&end=2"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("invalid request param"));
+    }
 }

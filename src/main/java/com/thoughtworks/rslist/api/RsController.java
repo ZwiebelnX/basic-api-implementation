@@ -2,6 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.exception.CustomException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +37,12 @@ public class RsController {
     }
 
     @GetMapping("rs/list")
-    public List<RsEvent> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
+    public List<RsEvent> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) throws CustomException {
         if (start == null || end == null) {
             return rsList;
         } else {
+            checkIndexOutOfBound(start, "invalid request param");
+            checkIndexOutOfBound(end - 1, "invalid request param");
             return rsList.subList(start - 1, end);
         }
     }
@@ -69,5 +72,12 @@ public class RsController {
     @DeleteMapping("rs/{index}")
     public void deleteOneRsEvent(@PathVariable int index) {
         rsList.remove(index - 1);
+    }
+
+
+    private void checkIndexOutOfBound(int index, String message) throws CustomException {
+        if (index - 1 < 0 || index - 1 >= rsList.size()) {
+            throw new CustomException(message);
+        }
     }
 }
