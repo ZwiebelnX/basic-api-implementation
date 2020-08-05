@@ -1,6 +1,6 @@
 package com.thoughtworks.rslist;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.api.RsController;
 import com.thoughtworks.rslist.domain.RsEvent;
@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.fasterxml.jackson.databind.MapperFeature.USE_ANNOTATIONS;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.hasKey;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -28,12 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RsListApplicationTests {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-    String requestBody;
+    private final ObjectMapper objectMapper;
 
     RsListApplicationTests() {
-        requestBody = "{\"eventName\":\"猪肉涨价了\",\"keyWord\":\"经济\",\"user\": {\"name\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}}";
+        objectMapper = new ObjectMapper();
+        objectMapper.configure(MapperFeature.USE_ANNOTATIONS, false);
     }
 
     @BeforeEach
@@ -76,6 +76,9 @@ class RsListApplicationTests {
 
     @Test
     public void add_one_event() throws Exception {
+        User user = new User("zhang", "female", 22, "xiaozhang@t.com", "18100000000");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
+        String requestBody = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(header().stringValues("index", "3"));
@@ -96,19 +99,27 @@ class RsListApplicationTests {
 
     @Test
     public void modify_one_event() throws Exception {
+        RsEvent rsEvent = new RsEvent("猪肉涨价了-改", "经济", null);
+        String requestBody = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(put("/rs/1").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
         mockMvc.perform(get("/rs/1"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
+            .andExpect(jsonPath("$.eventName").value("猪肉涨价了-改"))
             .andExpect(jsonPath("$.keyWord").value("经济"));
     }
 
     @Test
-    public void should_add_user() throws Exception {
+    public void should_add_user_once() throws Exception {
+        User user = new User("onion", "male", 19, "onion@163.com", "15800000000");
+        String requestBody = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user")
-            .content("{\"name\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}").contentType(MediaType.APPLICATION_JSON))
+            .content(requestBody).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
-            .andExpect(header().stringValues("index", "1"));
+            .andExpect(header().stringValues("index", "2"));
+        mockMvc.perform(post("/user")
+            .content(requestBody).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(header().stringValues("index", "2"));
     }
 
     @Test
@@ -139,8 +150,11 @@ class RsListApplicationTests {
 
     @Test
     void should_throw_error_when_post_rs_event_given_wrong_param() throws Exception {
+        User user = new User("zhang", "female", 22, "xiaozhang@t.com", "18100000000");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了", null, user);
+        String requestBody = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event")
-            .content("{\"eventName\":\"猪肉涨价了\",\"keyWord\":\"经济\",\"user\": {\"name\":\"xxxxxxxxxxyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}}")
+            .content(requestBody)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -149,8 +163,10 @@ class RsListApplicationTests {
 
     @Test
     void should_throw_error_when_post_user_given_wrong_param() throws Exception {
+        User user = new User("Xiao Zhang", "female", 22, "xiaozhang@t.com", "18100000000");
+        String requestBody = objectMapper.writeValueAsString(user);
         mockMvc.perform(
-            post("/user").content("{\"name\":\"xyxia\",\"age\": 1,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}")
+            post("/user").content(requestBody)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))

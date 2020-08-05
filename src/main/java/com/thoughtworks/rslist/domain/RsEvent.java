@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -11,8 +12,10 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class RsEvent {
+    @NotEmpty
     private String eventName;
 
+    @NotEmpty
     private String keyWord;
 
     @Valid
