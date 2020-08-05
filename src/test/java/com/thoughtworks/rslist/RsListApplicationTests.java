@@ -1,6 +1,10 @@
 package com.thoughtworks.rslist;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.api.RsController;
+import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.fasterxml.jackson.databind.MapperFeature.USE_ANNOTATIONS;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.hasKey;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,7 +42,7 @@ class RsListApplicationTests {
     }
 
     @Test
-    void contextLoads() throws Exception {
+    public void contextLoads() throws Exception {
         mockMvc.perform(get("/rs/list"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -50,7 +55,7 @@ class RsListApplicationTests {
     }
 
     @Test
-    void get_one_rs_event() throws Exception {
+    public void get_one_rs_event() throws Exception {
         mockMvc.perform(get("/rs/list/1"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -59,7 +64,7 @@ class RsListApplicationTests {
     }
 
     @Test
-    void get_some_rs_events() throws Exception {
+    public void get_some_rs_events() throws Exception {
         mockMvc.perform(get("/rs/list?start=1&end=2"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -70,7 +75,7 @@ class RsListApplicationTests {
     }
 
     @Test
-    void add_one_event() throws Exception {
+    public void add_one_event() throws Exception {
         mockMvc.perform(post("/rs/list").content(requestBody).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(header().stringValues("index", "3"));
@@ -81,7 +86,7 @@ class RsListApplicationTests {
     }
 
     @Test
-    void delete_one_event() throws Exception {
+    public void delete_one_event() throws Exception {
         mockMvc.perform(delete("/rs/list/1")).andExpect(status().isOk());
         mockMvc.perform(get("/rs/list/1"))
             .andExpect(status().isOk())
@@ -90,7 +95,7 @@ class RsListApplicationTests {
     }
 
     @Test
-    void modify_one_event() throws Exception {
+    public void modify_one_event() throws Exception {
         mockMvc.perform(put("/rs/list/1").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
         mockMvc.perform(get("/rs/list/1"))
             .andExpect(status().isOk())
@@ -99,7 +104,7 @@ class RsListApplicationTests {
     }
 
     @Test
-    void should_add_user() throws Exception {
+    public void should_add_user() throws Exception {
         mockMvc.perform(post("/user")
             .content("{\"name\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
@@ -107,13 +112,26 @@ class RsListApplicationTests {
     }
 
     @Test
-    void should_get_event_info_but_not_include_user_info() throws Exception {
+    public void should_get_event_info_but_not_include_user_info() throws Exception {
         mockMvc.perform(get("/rs/list/1"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$", not(hasKey("user"))))
             .andExpect(jsonPath("$.eventName").value("第一条事件"))
             .andExpect(jsonPath("$.keyWord").value("无"));
+    }
+
+    @Test
+    public void should_give_correct_user_json_when_get_user_info() throws Exception {
+        mockMvc.perform(get("/users"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[0].user_name").value("Sicong"))
+            .andExpect(jsonPath("$[0].user_age").value(22))
+            .andExpect(jsonPath("$[0].user_gender").value("male"))
+            .andExpect(jsonPath("$[0].user_email").value("sicong.chen@163.com"))
+            .andExpect(jsonPath("$[0].user_phone").value("15800000000"));
+
     }
 
 }

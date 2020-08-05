@@ -17,8 +17,6 @@ public class RsEvent {
 
     @Valid
     @NotNull
-    @JsonIgnore
-    @JsonProperty
     private User user;
 
     public String getEventName() {
