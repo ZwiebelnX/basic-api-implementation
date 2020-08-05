@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,40 +35,45 @@ public class RsController {
         rsList.add(rsEvent);
         rsEvent = new RsEvent("第三条事件", "无", user);
         rsList.add(rsEvent);
+        UserController.registerUser(user);
     }
 
     @GetMapping("rs/list")
-    public List<RsEvent> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) throws CustomException {
+    public ResponseEntity<List<RsEvent>> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) throws CustomException {
         if (start == null || end == null) {
-            return rsList;
+            return new ResponseEntity<>(rsList, HttpStatus.OK);
         } else {
             checkIndexOutOfBound(start, "invalid request param");
             checkIndexOutOfBound(end - 1, "invalid request param");
-            return rsList.subList(start - 1, end);
+            return new ResponseEntity<>(rsList.subList(start - 1, end), HttpStatus.OK);
         }
     }
 
     @GetMapping("rs/{index}")
-    public RsEvent getOneRsEvent(@PathVariable Integer index) throws CustomException {
+    public ResponseEntity<RsEvent> getOneRsEvent(@PathVariable Integer index) throws CustomException {
         checkIndexOutOfBound(index, "invalid index");
-        return rsList.get(index - 1);
+        return new ResponseEntity<>(rsList.get(index - 1), HttpStatus.OK);
     }
 
     @PostMapping("rs/event")
     public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEvent rsEvent) {
         rsList.add(rsEvent);
         UserController.registerUser(rsEvent.getUser());
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(rsList.indexOf(rsEvent))).build();
     }
 
     @PutMapping("rs/{index}")
-    public void modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
+    public ResponseEntity<String> modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
         if (rsEvent.getEventName() != null && !rsEvent.getEventName().isEmpty()) {
             rsList.get(index - 1).setEventName(rsEvent.getEventName());
         }
         if (rsEvent.getKeyWord() != null && !rsEvent.getEventName().isEmpty()) {
             rsList.get(index - 1).setKeyWord(rsEvent.getKeyWord());
         }
+        if (rsEvent.getUser() != null) {
+            rsList.get(index - 1).setUser(rsEvent.getUser());
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("rs/{index}")
