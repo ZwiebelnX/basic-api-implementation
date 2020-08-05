@@ -36,17 +36,17 @@ public class RsController {
     }
 
     @GetMapping("rs/list")
-    public List<RsEvent> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
+    public ResponseEntity<List<RsEvent>> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
         if (start == null || end == null) {
-            return rsList;
+            return new ResponseEntity<>(rsList, HttpStatus.OK);
         } else {
-            return rsList.subList(start - 1, end);
+            return new ResponseEntity<>(rsList.subList(start - 1, end), HttpStatus.OK);
         }
     }
 
     @GetMapping("rs/list/{index}")
-    public RsEvent getOneRsEvent(@PathVariable Integer index) {
-        return rsList.get(index - 1);
+    public ResponseEntity<RsEvent> getOneRsEvent(@PathVariable Integer index) {
+        return new ResponseEntity<>(rsList.get(index - 1), HttpStatus.OK);
     }
 
     @PostMapping("rs/list")
@@ -57,13 +57,17 @@ public class RsController {
     }
 
     @PutMapping("rs/list/{index}")
-    public void modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
+    public ResponseEntity<String> modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
         if (rsEvent.getEventName() != null && !rsEvent.getEventName().isEmpty()) {
             rsList.get(index - 1).setEventName(rsEvent.getEventName());
         }
         if (rsEvent.getKeyWord() != null && !rsEvent.getEventName().isEmpty()) {
             rsList.get(index - 1).setKeyWord(rsEvent.getKeyWord());
         }
+        if (rsEvent.getUser() != null) {
+            rsList.get(index - 1).setUser(rsEvent.getUser());
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("rs/list/{index}")
