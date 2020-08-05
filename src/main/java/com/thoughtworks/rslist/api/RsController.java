@@ -50,7 +50,12 @@ public class RsController {
 
     @PutMapping("rs/list/{index}")
     public void modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
-        rsList.set(index - 1, rsEvent);
+        if (rsEvent.getEventName() != null && !rsEvent.getEventName().isEmpty()) {
+            rsList.get(index - 1).setEventName(rsEvent.getEventName());
+        }
+        if (rsEvent.getKey() != null && !rsEvent.getEventName().isEmpty()) {
+            rsList.get(index - 1).setKey(rsEvent.getKey());
+        }
     }
 
     @DeleteMapping("rs/list/{index}")
