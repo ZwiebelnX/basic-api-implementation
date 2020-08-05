@@ -23,16 +23,20 @@ public class User {
     @Size(max = 8)
     private String name;
 
+    @NotNull
     @Pattern(regexp = "(fe)?male")
     private String gender;
 
     @Max(100)
     @Min(18)
+    @NotNull
     private int age;
 
+    @NotNull
     @Pattern(regexp = "[\\w|.]+@\\w+.com")
     private String email;
 
+    @NotNull
     @Pattern(regexp = "1\\d{10}")
     private String phone;
 
