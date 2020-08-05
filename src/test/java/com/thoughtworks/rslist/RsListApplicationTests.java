@@ -50,7 +50,7 @@ class RsListApplicationTests {
 
     @Test
     void get_one_rs_event() throws Exception {
-        mockMvc.perform(get("/rs/list/1"))
+        mockMvc.perform(get("/rs/1"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.eventName").value("第一条事件"))
@@ -70,8 +70,8 @@ class RsListApplicationTests {
 
     @Test
     void add_one_event() throws Exception {
-        mockMvc.perform(post("/rs/list").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
-        mockMvc.perform(get("/rs/list/4"))
+        mockMvc.perform(post("/rs").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
+        mockMvc.perform(get("/rs/4"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
             .andExpect(jsonPath("$.keyWord").value("经济"));
@@ -79,8 +79,8 @@ class RsListApplicationTests {
 
     @Test
     void delete_one_event() throws Exception {
-        mockMvc.perform(delete("/rs/list/1")).andExpect(status().isOk());
-        mockMvc.perform(get("/rs/list/1"))
+        mockMvc.perform(delete("/rs/1")).andExpect(status().isOk());
+        mockMvc.perform(get("/rs/1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.eventName").value("第二条事件"))
             .andExpect(jsonPath("$.keyWord").value("无"));
@@ -88,8 +88,8 @@ class RsListApplicationTests {
 
     @Test
     void modify_one_event() throws Exception {
-        mockMvc.perform(put("/rs/list/1").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-        mockMvc.perform(get("/rs/list/1"))
+        mockMvc.perform(put("/rs/1").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        mockMvc.perform(get("/rs/1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
             .andExpect(jsonPath("$.keyWord").value("经济"));
@@ -102,7 +102,7 @@ class RsListApplicationTests {
 
     @Test
     void should_get_event_info_but_not_include_user_info() throws Exception {
-        mockMvc.perform(get("/rs/list/1"))
+        mockMvc.perform(get("/rs/1"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$", not(hasKey("user"))))

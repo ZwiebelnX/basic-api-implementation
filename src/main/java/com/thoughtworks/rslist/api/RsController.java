@@ -44,19 +44,19 @@ public class RsController {
         }
     }
 
-    @GetMapping("rs/list/{index}")
+    @GetMapping("rs/{index}")
     public RsEvent getOneRsEvent(@PathVariable Integer index) {
         return rsList.get(index - 1);
     }
 
-    @PostMapping("rs/list")
+    @PostMapping("rs")
     public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEvent rsEvent) {
         rsList.add(rsEvent);
         UserController.registerUser(rsEvent.getUser());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping("rs/list/{index}")
+    @PutMapping("rs/{index}")
     public void modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
         if (rsEvent.getEventName() != null && !rsEvent.getEventName().isEmpty()) {
             rsList.get(index - 1).setEventName(rsEvent.getEventName());
@@ -66,7 +66,7 @@ public class RsController {
         }
     }
 
-    @DeleteMapping("rs/list/{index}")
+    @DeleteMapping("rs/{index}")
     public void deleteOneRsEvent(@PathVariable int index) {
         rsList.remove(index - 1);
     }
