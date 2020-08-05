@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.hasKey;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,7 +71,9 @@ class RsListApplicationTests {
 
     @Test
     void add_one_event() throws Exception {
-        mockMvc.perform(post("/rs/list").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
+        mockMvc.perform(post("/rs/list").content(requestBody).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(header().stringValues("index", "3"));
         mockMvc.perform(get("/rs/list/4"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
@@ -97,7 +100,10 @@ class RsListApplicationTests {
 
     @Test
     void should_add_user() throws Exception {
-        mockMvc.perform(post("/user").content("{\"name\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        mockMvc.perform(post("/user")
+            .content("{\"name\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(header().stringValues("index", "1"));
     }
 
     @Test

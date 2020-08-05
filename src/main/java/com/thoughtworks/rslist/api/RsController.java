@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class RsController {
         rsList.add(rsEvent);
         rsEvent = new RsEvent("第三条事件", "无", user);
         rsList.add(rsEvent);
+        UserController.registerUser(user);
     }
 
     @GetMapping("rs/list")
@@ -53,7 +55,7 @@ public class RsController {
     public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEvent rsEvent) {
         rsList.add(rsEvent);
         UserController.registerUser(rsEvent.getUser());
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(rsList.indexOf(rsEvent))).build();
     }
 
     @PutMapping("rs/list/{index}")
