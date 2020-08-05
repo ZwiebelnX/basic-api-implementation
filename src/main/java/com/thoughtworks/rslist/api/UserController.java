@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -16,11 +16,14 @@ import javax.validation.Valid;
 @RequestMapping("/user")
 public class UserController {
 
-    private List<User> userList = new ArrayList<>();
+    private static final Set<User> userSet = new HashSet<>();
 
     @PostMapping("")
     public void addUser(@RequestBody @Valid User user) {
-        userList.add(user);
+        userSet.add(user);
     }
 
+    public static void registerUser(User user) {
+        userSet.add(user);
+    }
 }

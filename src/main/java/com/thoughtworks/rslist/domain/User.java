@@ -7,10 +7,14 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Setter
+@Getter
+@ToString
 @NoArgsConstructor
 public class User {
 
@@ -38,5 +42,10 @@ public class User {
         this.age = age;
         this.email = email;
         this.phone = phone;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj.getClass() == User.class && ((User) obj).getName().equals(this.name);
     }
 }
