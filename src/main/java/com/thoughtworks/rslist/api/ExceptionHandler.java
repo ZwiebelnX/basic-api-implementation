@@ -2,6 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.Error;
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.CustomException;
 
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,9 @@ public class ExceptionHandler {
             MethodArgumentNotValidException methodArgumentNotValidException = (MethodArgumentNotValidException) e;
             if (methodArgumentNotValidException.getBindingResult().getTarget() instanceof RsEvent) {
                 errMessage = "invalid param";
+            }
+            if (methodArgumentNotValidException.getBindingResult().getTarget() instanceof User) {
+                errMessage = "invalid user";
             }
         }
         if (e instanceof CustomException) {

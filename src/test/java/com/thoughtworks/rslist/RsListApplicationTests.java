@@ -97,7 +97,8 @@ class RsListApplicationTests {
 
     @Test
     void should_add_user() throws Exception {
-        mockMvc.perform(post("/user").content("{\"name\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        mockMvc.perform(post("/user").content("{\"name\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -134,5 +135,15 @@ class RsListApplicationTests {
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.error").value("invalid param"));
+    }
+
+    @Test
+    void should_throw_error_when_post_user_given_wrong_param() throws Exception {
+        mockMvc.perform(
+            post("/user").content("{\"name\":\"xyxia\",\"age\": 1,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("invalid user"));
     }
 }
