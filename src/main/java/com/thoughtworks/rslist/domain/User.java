@@ -40,6 +40,8 @@ public class User {
     @Pattern(regexp = "1\\d{10}")
     private String phone;
 
+
+
     public User(String name, String gender, int age, String email, String phone) {
         this.name = name;
         this.gender = gender;
