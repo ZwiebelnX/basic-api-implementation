@@ -70,7 +70,7 @@ class RsListApplicationTests {
 
     @Test
     void add_one_event() throws Exception {
-        mockMvc.perform(post("/rs").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
+        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
         mockMvc.perform(get("/rs/4"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
@@ -124,5 +124,15 @@ class RsListApplicationTests {
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.error").value("invalid index"));
+    }
+
+    @Test
+    void should_throw_error_when_post_rs_event_given_wrong_param() throws Exception {
+        mockMvc.perform(post("/rs/event")
+            .content("{\"eventName\":\"猪肉涨价了\",\"keyWord\":\"经济\",\"user\": {\"name\":\"xxxxxxxxxxyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\"}}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("invalid param"));
     }
 }

@@ -53,7 +53,7 @@ public class RsController {
         return rsList.get(index - 1);
     }
 
-    @PostMapping("/rs")
+    @PostMapping("rs/event")
     public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEvent rsEvent) {
         rsList.add(rsEvent);
         UserController.registerUser(rsEvent.getUser());
