@@ -1,9 +1,11 @@
 package com.thoughtworks.rslist.model.po;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +31,7 @@ public class RsEventPo {
     @Column(length = 100)
     private String keyWord;
 
-    @Column
-    private Integer userId;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    private UserPo userPo;
 
 }

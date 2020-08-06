@@ -129,6 +129,14 @@ public class RsControllerTest {
         assertEquals("事件一改", rsEventRepo.findById(Integer.parseInt(eventId)).get().getEventName());
     }
 
+    @Test
+    void should_throw_error_when_get_single_event_given_wrong_index() throws Exception {
+        mockMvc.perform(get("/rs/-1"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("invalid index"));
+    }
+
     private String post_default_one_user() throws Exception {
         UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
         String requestBody = objectMapper.writeValueAsString(userDto);
@@ -146,14 +154,6 @@ public class RsControllerTest {
             .andReturn()
             .getResponse()
             .getHeader("index");
-    }
-
-    @Test
-    void should_throw_error_when_get_single_event_given_wrong_index() throws Exception {
-        mockMvc.perform(get("/rs/-1"))
-            .andExpect(status().isBadRequest())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.error").value("invalid index"));
     }
 
 }

@@ -1,9 +1,12 @@
 package com.thoughtworks.rslist.model.po;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -37,5 +40,8 @@ public class UserPo {
 
     @Column(length = 15)
     private String phone;
+
+    @OneToMany(mappedBy = "userPo")
+    private List<RsEventPo> rsEventPoList;
 
 }
