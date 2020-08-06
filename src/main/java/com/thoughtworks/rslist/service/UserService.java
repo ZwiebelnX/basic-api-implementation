@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 @Service
 public class UserService {
 
@@ -48,5 +50,10 @@ public class UserService {
             .email(userPO.getEmail())
             .phone(userPO.getPhone())
             .build();
+    }
+
+    @Transactional
+    public void deleteUser(Integer id) {
+        userRepo.deleteById(id);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -109,6 +110,19 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.user_gender").value("male"))
             .andExpect(jsonPath("$.user_email").value("onion@thoughtworks.com"))
             .andExpect(jsonPath("$.user_phone").value("18100000000"));
+    }
+
+    @Test
+    public void should_delete_user_when_delete_user_given_id() throws Exception {
+        UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
+        String requestBody = objectMapper.writeValueAsString(userDto);
+        String id = mockMvc.perform(post("/db/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("index");
+        mockMvc.perform(delete("/db/user/" + id)).andExpect(status().isOk());
+        mockMvc.perform(get("/db/user/" + id)).andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value("invalid user's id"));
     }
 
 }
