@@ -1,4 +1,4 @@
-package com.thoughtworks.rslist.api;
+package com.thoughtworks.rslist.compnent;
 
 import com.thoughtworks.rslist.domain.Error;
 import com.thoughtworks.rslist.domain.RsEvent;

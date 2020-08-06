@@ -26,7 +26,7 @@ public class RsController {
 
     private static final List<RsEvent> rsList = new ArrayList<>();
 
-    public static void initRsList() {
+    public static void initAll() {
         rsList.clear();
         User user = new User("Sicong", "male", 22, "sicong.chen@163.com", "15800000000");
         RsEvent rsEvent = new RsEvent("第一条事件", "无", user);
