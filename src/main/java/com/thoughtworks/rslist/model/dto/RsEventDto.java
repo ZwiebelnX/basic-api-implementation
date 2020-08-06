@@ -7,9 +7,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class RsEventDto {
 
     @NotEmpty
@@ -45,12 +49,6 @@ public class RsEventDto {
 
     @JsonProperty
     public void setUserDto(UserDto userDto) {
-        this.userDto = userDto;
-    }
-
-    public RsEventDto(String eventName, String keyWord, @Valid UserDto userDto) {
-        this.eventName = eventName;
-        this.keyWord = keyWord;
         this.userDto = userDto;
     }
 

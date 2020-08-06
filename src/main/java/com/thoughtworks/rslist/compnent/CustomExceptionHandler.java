@@ -10,13 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class ExceptionHandler {
+public class CustomExceptionHandler {
 
-    Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
+    Logger logger = LoggerFactory.getLogger(CustomExceptionHandler.class);
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(value = {MethodArgumentNotValidException.class, CustomException.class})
+    @ExceptionHandler(value = {MethodArgumentNotValidException.class, CustomException.class})
     public ResponseEntity<ErrorDto> exceptionHandler(Exception e) {
         String errMessage = "";
         if (e instanceof MethodArgumentNotValidException) {
