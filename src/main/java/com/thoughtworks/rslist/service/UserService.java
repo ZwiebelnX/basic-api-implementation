@@ -37,7 +37,7 @@ public class UserService {
         return userDtoList;
     }
 
-    public Integer regUserInDatabase(UserDto userDto) {
+    public Integer createUser(UserDto userDto) {
         UserPo userPO;
         userPO = userRepo.findFirstByName(userDto.getName());
         if (userPO == null) {
@@ -54,7 +54,7 @@ public class UserService {
         return userPO.getId();
     }
 
-    public UserDto getUserFromDatabase(Integer id) throws CustomException {
+    public UserDto getUser(Integer id) throws CustomException {
         Optional<UserPo> userPOOptional = userRepo.findById(id);
         if (!userPOOptional.isPresent()) {
             throw new CustomException("invalid user's id");
@@ -67,6 +67,14 @@ public class UserService {
             .email(userPo.getEmail())
             .phone(userPo.getPhone())
             .build();
+    }
+
+    public UserPo getUserPo(Integer id) throws CustomException {
+        Optional<UserPo> userPOOptional = userRepo.findById(id);
+        if (!userPOOptional.isPresent()) {
+            throw new CustomException("invalid user's id");
+        }
+        return userPOOptional.get();
     }
 
     @Transactional

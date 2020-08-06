@@ -3,6 +3,7 @@ package com.thoughtworks.rslist.service;
 import com.thoughtworks.rslist.exception.CustomException;
 import com.thoughtworks.rslist.model.dto.RsEventDto;
 import com.thoughtworks.rslist.model.po.RsEventPo;
+import com.thoughtworks.rslist.model.po.UserPo;
 import com.thoughtworks.rslist.repository.RsEventRepo;
 
 import org.springframework.stereotype.Service;
@@ -50,10 +51,8 @@ public class RsEventService {
     }
 
     public Integer createRsEvent(RsEventDto rsEventDto) throws CustomException {
-        if (!userService.isCheckUserIdExist(rsEventDto.getUserId())) {
-            throw new CustomException("user not exist");
-        }
-        RsEventPo rsEventPo = RsEventPo.builder().eventName(rsEventDto.getEventName()).keyWord(rsEventDto.getKeyWord()).build();
+        UserPo userPo = userService.getUserPo(rsEventDto.getUserId());
+        RsEventPo rsEventPo = RsEventPo.builder().eventName(rsEventDto.getEventName()).keyWord(rsEventDto.getKeyWord()).userPo(userPo).build();
         rsEventRepo.save(rsEventPo);
         return rsEventPo.getId();
     }
@@ -63,15 +62,17 @@ public class RsEventService {
         if (!rsEventPoOptional.isPresent()) {
             throw new CustomException("rs event not exist");
         }
-        if (!userService.isCheckUserIdExist(rsEventDto.getUserId())) {
-            throw new CustomException("user not exist");
-        }
+
         RsEventPo rsEventPo = rsEventPoOptional.get();
         if (!rsEventDto.getEventName().isEmpty()) {
             rsEventPo.setEventName(rsEventDto.getEventName());
         }
         if (!rsEventDto.getKeyWord().isEmpty()) {
             rsEventPo.setKeyWord(rsEventDto.getKeyWord());
+        }
+        if (rsEventDto.getUserId() != null) {
+            UserPo userPo = userService.getUserPo(rsEventDto.getUserId());
+            rsEventPo.setUserPo(userPo);
         }
         rsEventRepo.save(rsEventPo);
     }

@@ -2,7 +2,9 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.model.dto.RsEventDto;
 import com.thoughtworks.rslist.model.dto.UserDto;
+import com.thoughtworks.rslist.repository.RsEventRepo;
 import com.thoughtworks.rslist.repository.UserRepo;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,6 +36,9 @@ public class UserControllerTest {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private RsEventRepo rsEventRepo;
+
     UserControllerTest() {
         objectMapper = new ObjectMapper();
         objectMapper.configure(MapperFeature.USE_ANNOTATIONS, false);
@@ -41,6 +47,7 @@ public class UserControllerTest {
     @BeforeEach
     public void setUp() {
         userRepo.deleteAll();
+        rsEventRepo.deleteAll();
     }
 
     @Test
@@ -120,6 +127,42 @@ public class UserControllerTest {
             .getHeader("index");
         mockMvc.perform(delete("/user/" + id)).andExpect(status().isOk());
         mockMvc.perform(get("/user/" + id)).andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value("invalid user's id"));
+    }
+
+    @Test
+    public void should_delete_all_own_event_when_delete_user_given_user_id() throws Exception {
+        String userId = post_default_one_user();
+        RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件二", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件三", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件四", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+
+        mockMvc.perform(delete("/user/" + userId)).andExpect(status().isOk());
+        assertEquals(0, rsEventRepo.findAll().size());
+
+    }
+
+    private String post_default_one_user() throws Exception {
+        UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
+        String requestBody = objectMapper.writeValueAsString(userDto);
+        return mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("index");
+    }
+
+    private String post_one_event(RsEventDto rsEventDto) throws Exception {
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
+        return mockMvc.perform(post("/rs/event").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("index");
     }
 
 }

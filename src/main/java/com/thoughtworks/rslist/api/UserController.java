@@ -36,13 +36,13 @@ public class UserController {
 
     @PostMapping("/user")
     public ResponseEntity<String> regUserInDatabase(@RequestBody @Valid UserDto userDto) {
-        Integer index = userService.regUserInDatabase(userDto);
+        Integer index = userService.createUser(userDto);
         return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
     }
 
     @GetMapping("/user/{id}")
     public ResponseEntity<UserDto> getUserFromDatabase(@PathVariable Integer id) throws CustomException {
-        UserDto userDto = userService.getUserFromDatabase(id);
+        UserDto userDto = userService.getUser(id);
         return ResponseEntity.ok(userDto);
     }
 

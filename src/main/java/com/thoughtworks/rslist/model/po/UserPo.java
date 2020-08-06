@@ -2,6 +2,7 @@ package com.thoughtworks.rslist.model.po;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -41,7 +42,7 @@ public class UserPo {
     @Column(length = 15)
     private String phone;
 
-    @OneToMany(mappedBy = "userPo")
+    @OneToMany(mappedBy = "userPo", cascade = CascadeType.REMOVE)
     private List<RsEventPo> rsEventPoList;
 
 }
