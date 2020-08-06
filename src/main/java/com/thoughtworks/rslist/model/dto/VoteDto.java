@@ -17,5 +17,7 @@ public class VoteDto {
 
     private Integer userId;
 
+    private Integer rsEventId;
+
     private Timestamp voteTime;
 }
