@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.model.dto.RsEventDto;
 import com.thoughtworks.rslist.model.dto.UserDto;
+import com.thoughtworks.rslist.model.dto.VoteDto;
 import com.thoughtworks.rslist.repository.RsEventRepo;
 import com.thoughtworks.rslist.repository.UserRepo;
+import com.thoughtworks.rslist.repository.VoteRepo;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.sql.Timestamp;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,6 +44,9 @@ public class RsControllerTest {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private VoteRepo voteRepo;
 
     RsControllerTest() {
         objectMapper = new ObjectMapper();
@@ -143,11 +150,34 @@ public class RsControllerTest {
     }
 
     @Test
-    void should_throw_error_when_get_single_event_given_wrong_index() throws Exception {
+    public void should_throw_error_when_get_single_event_given_wrong_index() throws Exception {
         mockMvc.perform(get("/rs/-1"))
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.error").value("invalid index"));
+    }
+
+    @Test
+    public void should_vote_for_event_when_post_vote_given_correct_info() throws Exception {
+        String userId = post_one_user();
+        RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
+        String rsEventIdOne = post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件二", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件三", "无", Integer.parseInt(userId));
+        String rsEventIdTwo = post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件四", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+
+        VoteDto voteDto = VoteDto.builder().userId(Integer.parseInt(userId)).voteNum(2).voteTime(new Timestamp(System.currentTimeMillis())).build();
+        String requestBody = objectMapper.writeValueAsString(voteDto);
+        mockMvc.perform(post("/rs/vote/" + rsEventIdOne).contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isOk());
+        voteDto = VoteDto.builder().userId(Integer.parseInt(userId)).voteNum(4).voteTime(new Timestamp(System.currentTimeMillis())).build();
+        requestBody = objectMapper.writeValueAsString(voteDto);
+        mockMvc.perform(post("/rs/vote/" + rsEventIdTwo).contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isOk());
+
+        assertEquals(2, voteRepo.findAll().size());
+
     }
 
     private String post_one_user(UserDto userDto) throws Exception {

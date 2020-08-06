@@ -2,10 +2,12 @@ package com.thoughtworks.rslist.service;
 
 import com.thoughtworks.rslist.exception.CustomException;
 import com.thoughtworks.rslist.model.dto.RsEventDto;
+import com.thoughtworks.rslist.model.dto.VoteDto;
 import com.thoughtworks.rslist.model.po.RsEventPo;
 import com.thoughtworks.rslist.model.po.UserPo;
 import com.thoughtworks.rslist.repository.RsEventRepo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,11 +21,22 @@ public class RsEventService {
 
     private final RsEventRepo rsEventRepo;
 
-    private final UserService userService;
+    private UserService userService;
 
-    public RsEventService(RsEventRepo rsEventRepo, UserService userService) {
+    private VoteService voteService;
+
+    public RsEventService(RsEventRepo rsEventRepo) {
         this.rsEventRepo = rsEventRepo;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    @Autowired
+    public void setVoteService(VoteService voteService) {
+        this.voteService = voteService;
     }
 
     public List<RsEventDto> getList(Integer start, Integer end) {
@@ -58,11 +71,7 @@ public class RsEventService {
     }
 
     public void modifyEvent(int id, RsEventDto rsEventDto) throws CustomException {
-        Optional<RsEventPo> rsEventPoOptional = rsEventRepo.findById(id);
-        if (!rsEventPoOptional.isPresent()) {
-            throw new CustomException("rs event not exist");
-        }
-        RsEventPo rsEventPo = rsEventPoOptional.get();
+        RsEventPo rsEventPo = getRsEventPo(id);
         UserPo userPo = userService.getUserPo(rsEventDto.getUserId());
         if (userPo != rsEventPo.getUserPo()) {
             throw new CustomException("user not match");
@@ -80,4 +89,18 @@ public class RsEventService {
     public void deleteEvent(int id) {
         rsEventRepo.deleteById(id);
     }
+
+    public void voteForRsEvent(Integer rsEventId, VoteDto voteDto) throws CustomException {
+        userService.deductVoteNum(voteDto.getUserId(), voteDto.getVoteNum());
+        voteService.createVote(rsEventId, voteDto.getUserId(), voteDto.getVoteNum(), voteDto.getVoteTime());
+    }
+
+    public RsEventPo getRsEventPo(Integer id) throws CustomException {
+        Optional<RsEventPo> rsEventPoOptional = rsEventRepo.findById(id);
+        if (!rsEventPoOptional.isPresent()) {
+            throw new CustomException("rs event not exist");
+        }
+        return rsEventPoOptional.get();
+    }
+
 }

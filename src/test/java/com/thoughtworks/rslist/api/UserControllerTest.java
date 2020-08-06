@@ -131,7 +131,7 @@ public class UserControllerTest {
 
     @Test
     public void should_delete_all_own_event_when_delete_user_given_user_id() throws Exception {
-        String userId = post_default_one_user();
+        String userId = post_one_user();
         RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
         post_one_event(rsEventDto);
         rsEventDto = new RsEventDto("事件二", "无", Integer.parseInt(userId));
@@ -146,7 +146,7 @@ public class UserControllerTest {
 
     }
 
-    private String post_default_one_user() throws Exception {
+    private String post_one_user() throws Exception {
         UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
         String requestBody = objectMapper.writeValueAsString(userDto);
         return mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))

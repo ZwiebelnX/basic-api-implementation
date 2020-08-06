@@ -2,6 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.exception.CustomException;
 import com.thoughtworks.rslist.model.dto.RsEventDto;
+import com.thoughtworks.rslist.model.dto.VoteDto;
 import com.thoughtworks.rslist.service.RsEventService;
 
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,12 @@ public class RsController {
     @DeleteMapping("rs/{id}")
     public ResponseEntity<String> deleteOneRsEvent(@PathVariable int id) {
         rsEventService.deleteEvent(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("rs/vote/{id}")
+    public ResponseEntity<String> voteForRsEvent(@PathVariable Integer id, @RequestBody VoteDto voteDto) throws CustomException {
+        rsEventService.voteForRsEvent(id, voteDto);
         return ResponseEntity.ok().build();
     }
 }

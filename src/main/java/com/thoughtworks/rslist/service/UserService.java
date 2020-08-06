@@ -47,6 +47,7 @@ public class UserService {
                 .gender(userDto.getGender())
                 .email(userDto.getEmail())
                 .phone(userDto.getPhone())
+                .voteNum(10)
                 .build();
             userRepo.save(userPO);
         }
@@ -67,6 +68,15 @@ public class UserService {
             .email(userPo.getEmail())
             .phone(userPo.getPhone())
             .build();
+    }
+
+    public void deductVoteNum(int userId, int deduct) throws CustomException {
+        UserPo userPo = getUserPo(userId);
+        if (userPo.getVoteNum() < deduct) {
+            throw new CustomException("vote num insufficient");
+        }
+        userPo.setVoteNum(userPo.getVoteNum() - deduct);
+        userRepo.save(userPo);
     }
 
     public UserPo getUserPo(Integer id) throws CustomException {

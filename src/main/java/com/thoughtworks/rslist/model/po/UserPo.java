@@ -42,6 +42,12 @@ public class UserPo {
     @Column(length = 15)
     private String phone;
 
+    @Column
+    private Integer voteNum;
+
     @OneToMany(mappedBy = "userPo", cascade = CascadeType.REMOVE)
     private List<RsEventPo> rsEventPoList;
+
+    @OneToMany(mappedBy = "userPo", cascade = CascadeType.REMOVE)
+    private List<VotePo> votePoList;
 }
