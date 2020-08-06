@@ -29,12 +29,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    //    @PostMapping("/user")
-    //    public ResponseEntity<String> addUser(@RequestBody @Valid UserDto userDto) {
-    //        int index = registerUser(userDto);
-    //        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
-    //    }
-
     @GetMapping("/users")
     public ResponseEntity<List<UserDto>> getUser() {
         return ResponseEntity.ok(userService.getAllUsers());
@@ -46,10 +40,6 @@ public class UserController {
         }
         return USER_DTO_LIST.indexOf(userDto);
     }
-
-    /*
-     * ======================== DATABASE ========================
-     * */
 
     @PostMapping("/user")
     public ResponseEntity<String> regUserInDatabase(@RequestBody @Valid UserDto userDto) {
