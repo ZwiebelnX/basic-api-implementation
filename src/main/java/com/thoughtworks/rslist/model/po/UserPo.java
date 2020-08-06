@@ -1,4 +1,4 @@
-package com.thoughtworks.rslist.models.po;
+package com.thoughtworks.rslist.model.po;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,17 +16,26 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "rs_event")
-public class RsEventPO {
+@Table(name = "user")
+public class UserPo {
 
     @Id
     @GeneratedValue
     private Integer id;
 
-    @Column(length = 200)
-    private String eventName;
+    @Column(length = 40)
+    private String name;
 
-    @Column(length = 100)
-    private String keyWord;
+    @Column(length = 15)
+    private String gender;
+
+    @Column
+    private int age;
+
+    @Column(length = 30)
+    private String email;
+
+    @Column(length = 15)
+    private String phone;
 
 }

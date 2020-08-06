@@ -1,11 +1,11 @@
-package com.thoughtworks.rslist.domain;
+package com.thoughtworks.rslist.model.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Error {
+public class ErrorDto {
 
     private String error;
 

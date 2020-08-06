@@ -1,4 +1,4 @@
-package com.thoughtworks.rslist.domain;
+package com.thoughtworks.rslist.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,11 +7,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class RsEvent {
+public class RsEventDto {
+
     @NotEmpty
     private String eventName;
 
@@ -20,7 +20,7 @@ public class RsEvent {
 
     @Valid
     @NotNull
-    private User user;
+    private UserDto userDto;
 
     public String getEventName() {
         return eventName;
@@ -39,19 +39,19 @@ public class RsEvent {
     }
 
     @JsonIgnore
-    public User getUser() {
-        return user;
+    public UserDto getUserDto() {
+        return userDto;
     }
 
     @JsonProperty
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserDto(UserDto userDto) {
+        this.userDto = userDto;
     }
 
-    public RsEvent(String eventName, String keyWord,@Valid User user) {
+    public RsEventDto(String eventName, String keyWord, @Valid UserDto userDto) {
         this.eventName = eventName;
         this.keyWord = keyWord;
-        this.user = user;
+        this.userDto = userDto;
     }
 
 }

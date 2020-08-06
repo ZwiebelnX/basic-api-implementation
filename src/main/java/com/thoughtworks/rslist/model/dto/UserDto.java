@@ -1,4 +1,4 @@
-package com.thoughtworks.rslist.domain;
+package com.thoughtworks.rslist.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,7 +23,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class UserDto {
 
     @NotNull
     @NotEmpty
@@ -59,6 +59,6 @@ public class User {
 
     @Override
     public boolean equals(Object obj) {
-        return obj.getClass() == User.class && ((User) obj).getName().equals(this.name);
+        return obj.getClass() == UserDto.class && ((UserDto) obj).getName().equals(this.name);
     }
 }

@@ -1,8 +1,8 @@
 package com.thoughtworks.rslist.service;
 
-import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.CustomException;
-import com.thoughtworks.rslist.models.po.UserPO;
+import com.thoughtworks.rslist.model.dto.UserDto;
+import com.thoughtworks.rslist.model.po.UserPo;
 import com.thoughtworks.rslist.repository.UserRepo;
 
 import org.springframework.stereotype.Service;
@@ -18,16 +18,16 @@ public class UserService {
         this.userRepo = userRepo;
     }
 
-    public Integer regUserInDatabase(User user) {
-        UserPO userPO;
-        userPO = userRepo.findFirstByName(user.getName());
+    public Integer regUserInDatabase(UserDto userDto) {
+        UserPo userPO;
+        userPO = userRepo.findFirstByName(userDto.getName());
         if (userPO == null) {
-            userPO = UserPO.builder()
-                .name(user.getName())
-                .age(user.getAge())
-                .gender(user.getGender())
-                .email(user.getEmail())
-                .phone(user.getPhone())
+            userPO = UserPo.builder()
+                .name(userDto.getName())
+                .age(userDto.getAge())
+                .gender(userDto.getGender())
+                .email(userDto.getEmail())
+                .phone(userDto.getPhone())
                 .build();
             userRepo.save(userPO);
         }
@@ -35,13 +35,13 @@ public class UserService {
         return userPO.getId();
     }
 
-    public User getUserFromDatabase(Integer id) throws CustomException {
-        Optional<UserPO> userPOOptional = userRepo.findById(id);
+    public UserDto getUserFromDatabase(Integer id) throws CustomException {
+        Optional<UserPo> userPOOptional = userRepo.findById(id);
         if (!userPOOptional.isPresent()) {
             throw new CustomException("invalid user's id");
         }
-        UserPO userPO = userPOOptional.get();
-        return User.builder()
+        UserPo userPO = userPOOptional.get();
+        return UserDto.builder()
             .name(userPO.getName())
             .age(userPO.getAge())
             .gender(userPO.getGender())

@@ -2,7 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.model.dto.UserDto;
 import com.thoughtworks.rslist.repository.UserRepo;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,8 +46,8 @@ public class UserControllerTest {
 
     @Test
     public void should_add_user_once() throws Exception {
-        User user = new User("onion", "male", 19, "onion@163.com", "15800000000");
-        String requestBody = objectMapper.writeValueAsString(user);
+        UserDto userDto = new UserDto("onion", "male", 19, "onion@163.com", "15800000000");
+        String requestBody = objectMapper.writeValueAsString(userDto);
         mockMvc.perform(post("/user").content(requestBody).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(header().stringValues("index", "1"));
@@ -58,8 +58,8 @@ public class UserControllerTest {
 
     @Test
     void should_throw_error_when_post_user_given_wrong_param() throws Exception {
-        User user = new User("Xiao Zhang", "female", 22, "xiaozhang@t.com", "18100000000");
-        String requestBody = objectMapper.writeValueAsString(user);
+        UserDto userDto = new UserDto("Xiao Zhang", "female", 22, "xiaozhang@t.com", "18100000000");
+        String requestBody = objectMapper.writeValueAsString(userDto);
         mockMvc.perform(post("/user").content(requestBody).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -80,8 +80,8 @@ public class UserControllerTest {
 
     @Test
     public void should_register_user_in_database_when_post_reg_given_user_info() throws Exception {
-        User user = new User("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
-        String requestBody = objectMapper.writeValueAsString(user);
+        UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
+        String requestBody = objectMapper.writeValueAsString(userDto);
         String index = mockMvc.perform(post("/db/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
             .andExpect(status().isCreated())
             .andReturn()
@@ -94,8 +94,8 @@ public class UserControllerTest {
 
     @Test
     public void should_get_user_from_database_when_get_user() throws Exception {
-        User user = new User("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
-        String requestBody = objectMapper.writeValueAsString(user);
+        UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
+        String requestBody = objectMapper.writeValueAsString(userDto);
         String id = mockMvc.perform(post("/db/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
             .andExpect(status().isCreated())
             .andReturn()

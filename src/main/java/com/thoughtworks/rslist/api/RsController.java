@@ -1,8 +1,8 @@
 package com.thoughtworks.rslist.api;
 
-import com.thoughtworks.rslist.domain.RsEvent;
-import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.CustomException;
+import com.thoughtworks.rslist.model.dto.RsEventDto;
+import com.thoughtworks.rslist.model.dto.UserDto;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,22 +24,23 @@ import javax.validation.Valid;
 @RestController
 public class RsController {
 
-    private static final List<RsEvent> rsList = new ArrayList<>();
+    private static final List<RsEventDto> rsList = new ArrayList<>();
 
     public static void initAll() {
         rsList.clear();
-        User user = new User("Sicong", "male", 22, "sicong.chen@163.com", "15800000000");
-        RsEvent rsEvent = new RsEvent("第一条事件", "无", user);
-        rsList.add(rsEvent);
-        rsEvent = new RsEvent("第二条事件", "无", user);
-        rsList.add(rsEvent);
-        rsEvent = new RsEvent("第三条事件", "无", user);
-        rsList.add(rsEvent);
-        UserController.registerUser(user);
+        UserDto userDto = new UserDto("Sicong", "male", 22, "sicong.chen@163.com", "15800000000");
+        RsEventDto rsEventDto = new RsEventDto("第一条事件", "无", userDto);
+        rsList.add(rsEventDto);
+        rsEventDto = new RsEventDto("第二条事件", "无", userDto);
+        rsList.add(rsEventDto);
+        rsEventDto = new RsEventDto("第三条事件", "无", userDto);
+        rsList.add(rsEventDto);
+        UserController.registerUser(userDto);
     }
 
     @GetMapping("rs/list")
-    public ResponseEntity<List<RsEvent>> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) throws CustomException {
+    public ResponseEntity<List<RsEventDto>> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end)
+        throws CustomException {
         if (start == null || end == null) {
             return new ResponseEntity<>(rsList, HttpStatus.OK);
         } else {
@@ -50,28 +51,28 @@ public class RsController {
     }
 
     @GetMapping("rs/{index}")
-    public ResponseEntity<RsEvent> getOneRsEvent(@PathVariable Integer index) throws CustomException {
+    public ResponseEntity<RsEventDto> getOneRsEvent(@PathVariable Integer index) throws CustomException {
         checkIndexOutOfBound(index, "invalid index");
         return new ResponseEntity<>(rsList.get(index - 1), HttpStatus.OK);
     }
 
     @PostMapping("rs/event")
-    public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEvent rsEvent) {
-        rsList.add(rsEvent);
-        UserController.registerUser(rsEvent.getUser());
-        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(rsList.indexOf(rsEvent))).build();
+    public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEventDto rsEventDto) {
+        rsList.add(rsEventDto);
+        UserController.registerUser(rsEventDto.getUserDto());
+        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(rsList.indexOf(rsEventDto))).build();
     }
 
     @PutMapping("rs/{index}")
-    public ResponseEntity<String> modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
-        if (rsEvent.getEventName() != null && !rsEvent.getEventName().isEmpty()) {
-            rsList.get(index - 1).setEventName(rsEvent.getEventName());
+    public ResponseEntity<String> modifyOneRsEvent(@PathVariable int index, @RequestBody RsEventDto rsEventDto) {
+        if (rsEventDto.getEventName() != null && !rsEventDto.getEventName().isEmpty()) {
+            rsList.get(index - 1).setEventName(rsEventDto.getEventName());
         }
-        if (rsEvent.getKeyWord() != null && !rsEvent.getEventName().isEmpty()) {
-            rsList.get(index - 1).setKeyWord(rsEvent.getKeyWord());
+        if (rsEventDto.getKeyWord() != null && !rsEventDto.getEventName().isEmpty()) {
+            rsList.get(index - 1).setKeyWord(rsEventDto.getKeyWord());
         }
-        if (rsEvent.getUser() != null) {
-            rsList.get(index - 1).setUser(rsEvent.getUser());
+        if (rsEventDto.getUserDto() != null) {
+            rsList.get(index - 1).setUserDto(rsEventDto.getUserDto());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -80,7 +81,6 @@ public class RsController {
     public void deleteOneRsEvent(@PathVariable int index) {
         rsList.remove(index - 1);
     }
-
 
     private void checkIndexOutOfBound(int index, String message) throws CustomException {
         if (index - 1 < 0 || index - 1 >= rsList.size()) {

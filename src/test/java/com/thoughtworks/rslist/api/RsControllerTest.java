@@ -2,8 +2,8 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thoughtworks.rslist.domain.RsEvent;
-import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.model.dto.RsEventDto;
+import com.thoughtworks.rslist.model.dto.UserDto;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,9 +78,9 @@ public class RsControllerTest {
 
     @Test
     public void add_one_event() throws Exception {
-        User user = new User("zhang", "female", 22, "xiaozhang@t.com", "18100000000");
-        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
-        String requestBody = objectMapper.writeValueAsString(rsEvent);
+        UserDto userDto = new UserDto("zhang", "female", 22, "xiaozhang@t.com", "18100000000");
+        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", "经济", userDto);
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
         mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(header().stringValues("index", "3"));
@@ -101,8 +101,8 @@ public class RsControllerTest {
 
     @Test
     public void modify_one_event() throws Exception {
-        RsEvent rsEvent = new RsEvent("猪肉涨价了-改", "经济", null);
-        String requestBody = objectMapper.writeValueAsString(rsEvent);
+        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了-改", "经济", null);
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
         mockMvc.perform(put("/rs/1").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
         mockMvc.perform(get("/rs/1"))
             .andExpect(status().isOk())
@@ -138,12 +138,10 @@ public class RsControllerTest {
 
     @Test
     void should_throw_error_when_post_rs_event_given_wrong_param() throws Exception {
-        User user = new User("zhang", "female", 22, "xiaozhang@t.com", "18100000000");
-        RsEvent rsEvent = new RsEvent("猪肉涨价了", null, user);
-        String requestBody = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/event")
-            .content(requestBody)
-            .contentType(MediaType.APPLICATION_JSON))
+        UserDto userDto = new UserDto("zhang", "female", 22, "xiaozhang@t.com", "18100000000");
+        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", null, userDto);
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
+        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.error").value("invalid param"));

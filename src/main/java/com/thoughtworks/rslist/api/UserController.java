@@ -1,7 +1,7 @@
 package com.thoughtworks.rslist.api;
 
-import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.CustomException;
+import com.thoughtworks.rslist.model.dto.UserDto;
 import com.thoughtworks.rslist.service.UserService;
 
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @RestController
 public class UserController {
 
-    private static final List<User> userList = new ArrayList<>();
+    private static final List<UserDto> USER_DTO_LIST = new ArrayList<>();
 
     private final UserService userService;
 
@@ -29,21 +29,21 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<String> addUser(@RequestBody @Valid User user) {
-        int index = registerUser(user);
+    public ResponseEntity<String> addUser(@RequestBody @Valid UserDto userDto) {
+        int index = registerUser(userDto);
         return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUser() {
-        return ResponseEntity.ok(userList);
+    public ResponseEntity<List<UserDto>> getUser() {
+        return ResponseEntity.ok(USER_DTO_LIST);
     }
 
-    public static int registerUser(User user) {
-        if (!userList.contains(user)) {
-            userList.add(user);
+    public static int registerUser(UserDto userDto) {
+        if (!USER_DTO_LIST.contains(userDto)) {
+            USER_DTO_LIST.add(userDto);
         }
-        return userList.indexOf(user);
+        return USER_DTO_LIST.indexOf(userDto);
     }
 
     /*
@@ -51,14 +51,14 @@ public class UserController {
      * */
 
     @PostMapping("/db/user")
-    public ResponseEntity<String> regUserInDatabase(@RequestBody @Valid User user) {
-        Integer index = userService.regUserInDatabase(user);
+    public ResponseEntity<String> regUserInDatabase(@RequestBody @Valid UserDto userDto) {
+        Integer index = userService.regUserInDatabase(userDto);
         return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
     }
 
     @GetMapping("/db/user/{id}")
-    public ResponseEntity<User> getUserFromDatabase(@PathVariable Integer id) throws CustomException {
-        User user = userService.getUserFromDatabase(id);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserDto> getUserFromDatabase(@PathVariable Integer id) throws CustomException {
+        UserDto userDto = userService.getUserFromDatabase(id);
+        return ResponseEntity.ok(userDto);
     }
 }

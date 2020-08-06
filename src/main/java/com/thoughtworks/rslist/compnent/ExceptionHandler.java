@@ -1,9 +1,9 @@
 package com.thoughtworks.rslist.compnent;
 
-import com.thoughtworks.rslist.domain.Error;
-import com.thoughtworks.rslist.domain.RsEvent;
-import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.CustomException;
+import com.thoughtworks.rslist.model.dto.ErrorDto;
+import com.thoughtworks.rslist.model.dto.RsEventDto;
+import com.thoughtworks.rslist.model.dto.UserDto;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +17,14 @@ public class ExceptionHandler {
     Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = {MethodArgumentNotValidException.class, CustomException.class})
-    public ResponseEntity<Error> exceptionHandler(Exception e) {
+    public ResponseEntity<ErrorDto> exceptionHandler(Exception e) {
         String errMessage = "";
         if (e instanceof MethodArgumentNotValidException) {
             MethodArgumentNotValidException methodArgumentNotValidException = (MethodArgumentNotValidException) e;
-            if (methodArgumentNotValidException.getBindingResult().getTarget() instanceof RsEvent) {
+            if (methodArgumentNotValidException.getBindingResult().getTarget() instanceof RsEventDto) {
                 errMessage = "invalid param";
             }
-            if (methodArgumentNotValidException.getBindingResult().getTarget() instanceof User) {
+            if (methodArgumentNotValidException.getBindingResult().getTarget() instanceof UserDto) {
                 errMessage = "invalid user";
             }
         }
@@ -32,8 +32,8 @@ public class ExceptionHandler {
             errMessage = ((CustomException) e).getErrorMessage();
         }
         logger.error(errMessage);
-        Error error = new Error();
-        error.setError(errMessage);
-        return ResponseEntity.badRequest().body(error);
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setError(errMessage);
+        return ResponseEntity.badRequest().body(errorDto);
     }
 }
