@@ -44,5 +44,4 @@ public class UserPo {
 
     @OneToMany(mappedBy = "userPo", cascade = CascadeType.REMOVE)
     private List<RsEventPo> rsEventPoList;
-
 }

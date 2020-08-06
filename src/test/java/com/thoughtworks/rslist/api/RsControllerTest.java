@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,7 +54,7 @@ public class RsControllerTest {
 
     @Test
     public void should_add_event_when_post_event_given_correct_info() throws Exception {
-        String userId = post_default_one_user();
+        String userId = post_one_user();
         RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", "经济", Integer.parseInt(userId));
         String requestBody = objectMapper.writeValueAsString(rsEventDto);
         mockMvc.perform(post("/rs/event").contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isCreated());
@@ -70,7 +70,7 @@ public class RsControllerTest {
 
     @Test
     public void should_get_one_event_when_get_event_given_event_id() throws Exception {
-        String userId = post_default_one_user();
+        String userId = post_one_user();
         RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", "经济", Integer.parseInt(userId));
         String eventId = post_one_event(rsEventDto);
         mockMvc.perform(get("/rs/" + eventId))
@@ -81,7 +81,7 @@ public class RsControllerTest {
 
     @Test
     public void should_get_all_events_when_get_event_list_given_non_args() throws Exception {
-        String userId = post_default_one_user();
+        String userId = post_one_user();
         RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
         post_one_event(rsEventDto);
         rsEventDto = new RsEventDto("事件二", "无", Integer.parseInt(userId));
@@ -96,7 +96,7 @@ public class RsControllerTest {
 
     @Test
     public void should_get_some_events_when_get_event_list_given_start_and_end_index() throws Exception {
-        String userId = post_default_one_user();
+        String userId = post_one_user();
         RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
         String startId = post_one_event(rsEventDto);
         rsEventDto = new RsEventDto("事件二", "无", Integer.parseInt(userId));
@@ -110,7 +110,7 @@ public class RsControllerTest {
 
     @Test
     public void should_delete_one_event_when_delete_event_given_event_id() throws Exception {
-        String userId = post_default_one_user();
+        String userId = post_one_user();
         RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
         String eventId = post_one_event(rsEventDto);
         mockMvc.perform(delete("/rs/" + eventId)).andExpect(status().isOk());
@@ -119,14 +119,27 @@ public class RsControllerTest {
 
     @Test
     public void should_modify_one_event_when_put_event_given_event_dto() throws Exception {
-        String userId = post_default_one_user();
+        String userId = post_one_user();
         RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
         String eventId = post_one_event(rsEventDto);
         rsEventDto = new RsEventDto("事件一改", "无", Integer.parseInt(userId));
         String requestBody = objectMapper.writeValueAsString(rsEventDto);
 
-        mockMvc.perform(put("/rs/" + eventId).contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isOk());
+        mockMvc.perform(patch("/rs/" + eventId).contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isOk());
         assertEquals("事件一改", rsEventRepo.findById(Integer.parseInt(eventId)).get().getEventName());
+    }
+
+    @Test
+    public void should_throw_error_when_patch_event_given_wrong_userId() throws Exception {
+        String userId = post_one_user();
+        UserDto userDto = new UserDto("chen", "male", 20, "chen@thoughtworks.com", "14100000000");
+        String anotherUserId = post_one_user(userDto);
+        RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
+        String eventId = post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件一改", "无", Integer.parseInt(anotherUserId));
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
+
+        mockMvc.perform(patch("/rs/" + eventId).contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -137,14 +150,18 @@ public class RsControllerTest {
             .andExpect(jsonPath("$.error").value("invalid index"));
     }
 
-    private String post_default_one_user() throws Exception {
-        UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
+    private String post_one_user(UserDto userDto) throws Exception {
         String requestBody = objectMapper.writeValueAsString(userDto);
         return mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
             .andExpect(status().isCreated())
             .andReturn()
             .getResponse()
             .getHeader("index");
+    }
+
+    private String post_one_user() throws Exception {
+        UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
+        return post_one_user(userDto);
     }
 
     private String post_one_event(RsEventDto rsEventDto) throws Exception {

@@ -62,17 +62,16 @@ public class RsEventService {
         if (!rsEventPoOptional.isPresent()) {
             throw new CustomException("rs event not exist");
         }
-
         RsEventPo rsEventPo = rsEventPoOptional.get();
+        UserPo userPo = userService.getUserPo(rsEventDto.getUserId());
+        if (userPo != rsEventPo.getUserPo()) {
+            throw new CustomException("user not match");
+        }
         if (!rsEventDto.getEventName().isEmpty()) {
             rsEventPo.setEventName(rsEventDto.getEventName());
         }
         if (!rsEventDto.getKeyWord().isEmpty()) {
             rsEventPo.setKeyWord(rsEventDto.getKeyWord());
-        }
-        if (rsEventDto.getUserId() != null) {
-            UserPo userPo = userService.getUserPo(rsEventDto.getUserId());
-            rsEventPo.setUserPo(userPo);
         }
         rsEventRepo.save(rsEventPo);
     }
