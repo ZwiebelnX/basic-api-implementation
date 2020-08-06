@@ -1,10 +1,13 @@
 package com.thoughtworks.rslist.service;
 
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.exception.CustomException;
 import com.thoughtworks.rslist.models.po.UserPO;
 import com.thoughtworks.rslist.repository.UserRepo;
 
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -30,5 +33,20 @@ public class UserService {
         }
 
         return userPO.getId();
+    }
+
+    public User getUserFromDatabase(Integer id) throws CustomException {
+        Optional<UserPO> userPOOptional = userRepo.findById(id);
+        if (!userPOOptional.isPresent()) {
+            throw new CustomException("invalid user's id");
+        }
+        UserPO userPO = userPOOptional.get();
+        return User.builder()
+            .name(userPO.getName())
+            .age(userPO.getAge())
+            .gender(userPO.getGender())
+            .email(userPO.getEmail())
+            .phone(userPO.getPhone())
+            .build();
     }
 }

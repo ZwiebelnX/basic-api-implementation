@@ -1,10 +1,12 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.exception.CustomException;
 import com.thoughtworks.rslist.service.UserService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,10 +34,9 @@ public class UserController {
         return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
     }
 
-    @PostMapping("/user/reg")
-    public ResponseEntity<String> regUserInDatabase(@RequestBody @Valid User user) {
-        Integer index = userService.regUserInDatabase(user);
-        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getUser() {
+        return ResponseEntity.ok(userList);
     }
 
     public static int registerUser(User user) {
@@ -45,8 +46,19 @@ public class UserController {
         return userList.indexOf(user);
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<List<User>> getUser() {
-        return ResponseEntity.ok(userList);
+    /*
+     * ======================== DATABASE ========================
+     * */
+
+    @PostMapping("/db/user")
+    public ResponseEntity<String> regUserInDatabase(@RequestBody @Valid User user) {
+        Integer index = userService.regUserInDatabase(user);
+        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
+    }
+
+    @GetMapping("/db/user/{id}")
+    public ResponseEntity<User> getUserFromDatabase(@PathVariable Integer id) throws CustomException {
+        User user = userService.getUserFromDatabase(id);
+        return ResponseEntity.ok(user);
     }
 }

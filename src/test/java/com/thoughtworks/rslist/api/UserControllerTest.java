@@ -80,16 +80,35 @@ public class UserControllerTest {
 
     @Test
     public void should_register_user_in_database_when_post_reg_given_user_info() throws Exception {
-        User user = new User("onion", "female", 22, "xiaozhang@t.com", "18100000000");
+        User user = new User("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
         String requestBody = objectMapper.writeValueAsString(user);
-        String index = mockMvc.perform(post("/user/reg").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String index = mockMvc.perform(post("/db/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
             .andExpect(status().isCreated())
             .andReturn()
             .getResponse()
             .getHeader("index");
-        mockMvc.perform(post("/user/reg").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        mockMvc.perform(post("/db/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
             .andExpect(status().isCreated())
             .andExpect(header().stringValues("index", String.valueOf(index)));
+    }
+
+    @Test
+    public void should_get_user_from_database_when_get_user() throws Exception {
+        User user = new User("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
+        String requestBody = objectMapper.writeValueAsString(user);
+        String id = mockMvc.perform(post("/db/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("index");
+        mockMvc.perform(get("/db/user/" + id))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.user_name").value("onion"))
+            .andExpect(jsonPath("$.user_age").value(22))
+            .andExpect(jsonPath("$.user_gender").value("male"))
+            .andExpect(jsonPath("$.user_email").value("onion@thoughtworks.com"))
+            .andExpect(jsonPath("$.user_phone").value("18100000000"));
     }
 
 }
