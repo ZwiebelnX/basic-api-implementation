@@ -43,7 +43,7 @@ public class RsEventService {
     public RsEventDto getEvent(Integer id) throws CustomException {
         Optional<RsEventPo> rsEventPoOptional = rsEventRepo.findById(id);
         if (!rsEventPoOptional.isPresent()) {
-            throw new CustomException("user not exist!");
+            throw new CustomException("invalid index");
         }
         RsEventPo rsEventPo = rsEventPoOptional.get();
         return RsEventDto.builder().eventName(rsEventPo.getEventName()).keyWord(rsEventPo.getKeyWord()).build();
@@ -61,7 +61,10 @@ public class RsEventService {
     public void modifyEvent(int id, RsEventDto rsEventDto) throws CustomException {
         Optional<RsEventPo> rsEventPoOptional = rsEventRepo.findById(id);
         if (!rsEventPoOptional.isPresent()) {
-            throw new CustomException("user not exist!");
+            throw new CustomException("rs event not exist");
+        }
+        if (!userService.isCheckUserIdExist(rsEventDto.getUserId())) {
+            throw new CustomException("user not exist");
         }
         RsEventPo rsEventPo = rsEventPoOptional.get();
         if (!rsEventDto.getEventName().isEmpty()) {

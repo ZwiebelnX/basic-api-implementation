@@ -15,8 +15,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -47,7 +54,7 @@ public class RsControllerTest {
 
     @Test
     public void should_add_event_when_post_event_given_correct_info() throws Exception {
-        String userId = create_one_user();
+        String userId = post_default_one_user();
         RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", "经济", Integer.parseInt(userId));
         String requestBody = objectMapper.writeValueAsString(rsEventDto);
         mockMvc.perform(post("/rs/event").contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isCreated());
@@ -61,7 +68,68 @@ public class RsControllerTest {
         mockMvc.perform(post("/rs/event").contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isBadRequest());
     }
 
-    private String create_one_user() throws Exception {
+    @Test
+    public void should_get_one_event_when_get_event_given_event_id() throws Exception {
+        String userId = post_default_one_user();
+        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", "经济", Integer.parseInt(userId));
+        String eventId = post_one_event(rsEventDto);
+        mockMvc.perform(get("/rs/" + eventId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
+            .andExpect(jsonPath("$.keyWord").value("经济"));
+    }
+
+    @Test
+    public void should_get_all_events_when_get_event_list_given_non_args() throws Exception {
+        String userId = post_default_one_user();
+        RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件二", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件三", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件四", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        mockMvc.perform(get("/rs/list")).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(4)));
+
+    }
+
+    @Test
+    public void should_get_some_events_when_get_event_list_given_start_and_end_index() throws Exception {
+        String userId = post_default_one_user();
+        RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
+        String startId = post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件二", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件三", "无", Integer.parseInt(userId));
+        String endId = post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件四", "无", Integer.parseInt(userId));
+        post_one_event(rsEventDto);
+        mockMvc.perform(get("/rs/list?start=" + startId + "&end=" + endId)).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(3)));
+    }
+
+    @Test
+    public void should_delete_one_event_when_delete_event_given_event_id() throws Exception {
+        String userId = post_default_one_user();
+        RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
+        String eventId = post_one_event(rsEventDto);
+        mockMvc.perform(delete("/rs/" + eventId)).andExpect(status().isOk());
+        assertFalse(rsEventRepo.findById(Integer.parseInt(eventId)).isPresent());
+    }
+
+    @Test
+    public void should_modify_one_event_when_put_event_given_event_dto() throws Exception {
+        String userId = post_default_one_user();
+        RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));
+        String eventId = post_one_event(rsEventDto);
+        rsEventDto = new RsEventDto("事件一改", "无", Integer.parseInt(userId));
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
+
+        mockMvc.perform(put("/rs/" + eventId).contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isOk());
+        assertEquals("事件一改", rsEventRepo.findById(Integer.parseInt(eventId)).get().getEventName());
+    }
+
+    private String post_default_one_user() throws Exception {
         UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
         String requestBody = objectMapper.writeValueAsString(userDto);
         return mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
@@ -71,109 +139,21 @@ public class RsControllerTest {
             .getHeader("index");
     }
 
-    //
-    //    @Test
-    //    public void should_get_all_rs_event_when_get_rs_list() throws Exception {
-    //        mockMvc.perform(get("/rs/list"))
-    //            .andExpect(status().isOk())
-    //            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
-    //            .andExpect(jsonPath("$[0].keyWord").value("无"))
-    //            .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
-    //            .andExpect(jsonPath("$[1].keyWord").value("无"))
-    //            .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
-    //            .andExpect(jsonPath("$[2].keyWord").value("无"));
-    //    }
-    //
-    //    @Test
-    //    public void get_one_rs_event() throws Exception {
-    //        mockMvc.perform(get("/rs/1"))
-    //            .andExpect(status().isOk())
-    //            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(jsonPath("$.eventName").value("第一条事件"))
-    //            .andExpect(jsonPath("$.keyWord").value("无"));
-    //    }
-    //
-    //    @Test
-    //    public void get_some_rs_events() throws Exception {
-    //        mockMvc.perform(get("/rs/list?start=1&end=2"))
-    //            .andExpect(status().isOk())
-    //            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
-    //            .andExpect(jsonPath("$[0].keyWord").value("无"))
-    //            .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
-    //            .andExpect(jsonPath("$[1].keyWord").value("无"));
-    //    }
-    //
-    //    @Test
-    //    public void add_one_event() throws Exception {
-    //        UserDto userDto = new UserDto("zhang", "female", 22, "xiaozhang@t.com", "18100000000");
-    //        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", "经济", userDto);
-    //        String requestBody = objectMapper.writeValueAsString(rsEventDto);
-    //        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(status().isCreated())
-    //            .andExpect(header().stringValues("index", "3"));
-    //        mockMvc.perform(get("/rs/4"))
-    //            .andExpect(status().isOk())
-    //            .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
-    //            .andExpect(jsonPath("$.keyWord").value("经济"));
-    //    }
-    //
-    //    @Test
-    //    public void delete_one_event() throws Exception {
-    //        mockMvc.perform(delete("/rs/1")).andExpect(status().isOk());
-    //        mockMvc.perform(get("/rs/1"))
-    //            .andExpect(status().isOk())
-    //            .andExpect(jsonPath("$.eventName").value("第二条事件"))
-    //            .andExpect(jsonPath("$.keyWord").value("无"));
-    //    }
-    //
-    //    @Test
-    //    public void modify_one_event() throws Exception {
-    //        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了-改", "经济", null);
-    //        String requestBody = objectMapper.writeValueAsString(rsEventDto);
-    //        mockMvc.perform(put("/rs/1").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-    //        mockMvc.perform(get("/rs/1"))
-    //            .andExpect(status().isOk())
-    //            .andExpect(jsonPath("$.eventName").value("猪肉涨价了-改"))
-    //            .andExpect(jsonPath("$.keyWord").value("经济"));
-    //    }
-    //
-    //    @Test
-    //    public void should_get_event_info_but_not_include_user_info() throws Exception {
-    //        mockMvc.perform(get("/rs/1"))
-    //            .andExpect(status().isOk())
-    //            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(jsonPath("$", not(hasKey("user"))))
-    //            .andExpect(jsonPath("$.eventName").value("第一条事件"))
-    //            .andExpect(jsonPath("$.keyWord").value("无"));
-    //    }
-    //
-    //    @Test
-    //    void should_throw_error_when_get_list_given_wrong_index() throws Exception {
-    //        mockMvc.perform(get("/rs/list?start=-1&end=2"))
-    //            .andExpect(status().isBadRequest())
-    //            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(jsonPath("$.error").value("invalid request param"));
-    //    }
-    //
-    //    @Test
-    //    void should_throw_error_when_get_single_event_given_wrong_index() throws Exception {
-    //        mockMvc.perform(get("/rs/-1"))
-    //            .andExpect(status().isBadRequest())
-    //            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(jsonPath("$.error").value("invalid index"));
-    //    }
-    //
-    //    @Test
-    //    void should_throw_error_when_post_rs_event_given_wrong_param() throws Exception {
-    //        UserDto userDto = new UserDto("zhang", "female", 22, "xiaozhang@t.com", "18100000000");
-    //        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", null, userDto);
-    //        String requestBody = objectMapper.writeValueAsString(rsEventDto);
-    //        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(status().isBadRequest())
-    //            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-    //            .andExpect(jsonPath("$.error").value("invalid param"));
-    //    }
+    private String post_one_event(RsEventDto rsEventDto) throws Exception {
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
+        return mockMvc.perform(post("/rs/event").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("index");
+    }
+
+    @Test
+    void should_throw_error_when_get_single_event_given_wrong_index() throws Exception {
+        mockMvc.perform(get("/rs/-1"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("invalid index"));
+    }
 
 }

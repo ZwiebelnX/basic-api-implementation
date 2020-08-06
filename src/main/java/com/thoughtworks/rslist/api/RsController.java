@@ -23,24 +23,11 @@ import javax.validation.Valid;
 @RestController
 public class RsController {
 
-    //    private static final List<RsEventDto> rsList = new ArrayList<>();
     private final RsEventService rsEventService;
 
     public RsController(RsEventService rsEventService) {
         this.rsEventService = rsEventService;
     }
-    //
-    //    public static void initAll() {
-    //        rsList.clear();
-    //        UserDto userDto = new UserDto("Sicong", "male", 22, "sicong.chen@163.com", "15800000000");
-    //        RsEventDto rsEventDto = new RsEventDto("第一条事件", "无", userDto);
-    //        rsList.add(rsEventDto);
-    //        rsEventDto = new RsEventDto("第二条事件", "无", userDto);
-    //        rsList.add(rsEventDto);
-    //        rsEventDto = new RsEventDto("第三条事件", "无", userDto);
-    //        rsList.add(rsEventDto);
-    //        UserController.registerUser(userDto);
-    //    }
 
     @GetMapping("rs/list")
     public ResponseEntity<List<RsEventDto>> getList(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
