@@ -104,6 +104,18 @@ public class RsControllerTest {
     }
 
     @Test
+    public void should_get_page_event_when_get_event_page_given_page_num() throws Exception {
+        String userId = post_one_user();
+        RsEventDto rsEventDto;
+        for (int i = 0; i < 8; i++) {
+            rsEventDto = new RsEventDto("事件" + (i + 1), "无", Integer.parseInt(userId));
+            post_one_event(rsEventDto);
+        }
+        mockMvc.perform(get("/rs/page/1")).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(5)));
+
+    }
+
+    @Test
     public void should_get_some_events_when_get_event_list_given_start_and_end_index() throws Exception {
         String userId = post_one_user();
         RsEventDto rsEventDto = new RsEventDto("事件一", "无", Integer.parseInt(userId));

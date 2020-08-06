@@ -9,6 +9,8 @@ import com.thoughtworks.rslist.model.po.VotePo;
 import com.thoughtworks.rslist.repository.RsEventRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -113,4 +115,21 @@ public class RsEventService {
         return rsEventPoOptional.get();
     }
 
+    public List<RsEventDto> getPageList(int page, Integer pageSize) {
+        List<RsEventDto> rsEventDtoList = new ArrayList<>();
+        Page<RsEventPo> rsEventPoList = rsEventRepo.findAll(PageRequest.of(page - 1, pageSize));
+        for (RsEventPo rsEventPo : rsEventPoList) {
+            RsEventDto rsEventDto = RsEventDto.builder()
+                .id(rsEventPo.getId())
+                .keyWord(rsEventPo.getKeyWord())
+                .eventName(rsEventPo.getEventName())
+                .voteNum(0)
+                .build();
+            for (VotePo votePo : rsEventPo.getVotePoList()) {
+                rsEventDto.setVoteNum(rsEventDto.getVoteNum() + votePo.getVoteNum());
+            }
+            rsEventDtoList.add(rsEventDto);
+        }
+        return rsEventDtoList;
+    }
 }

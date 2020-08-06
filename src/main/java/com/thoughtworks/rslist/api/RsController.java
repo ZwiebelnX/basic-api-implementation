@@ -35,6 +35,12 @@ public class RsController {
         return ResponseEntity.ok(rsEventService.getList(start, end));
     }
 
+    @GetMapping("rs/page/{page}")
+    public ResponseEntity<List<RsEventDto>> getPageList(@PathVariable int page,
+        @RequestParam(required = false, defaultValue = "5") Integer pageSize) {
+        return ResponseEntity.ok(rsEventService.getPageList(page, pageSize));
+    }
+
     @GetMapping("rs/{id}")
     public ResponseEntity<RsEventDto> getOneRsEvent(@PathVariable Integer id) throws CustomException {
         return new ResponseEntity<>(rsEventService.getEvent(id), HttpStatus.OK);
