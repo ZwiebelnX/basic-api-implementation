@@ -29,15 +29,15 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/user")
-    public ResponseEntity<String> addUser(@RequestBody @Valid UserDto userDto) {
-        int index = registerUser(userDto);
-        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
-    }
+    //    @PostMapping("/user")
+    //    public ResponseEntity<String> addUser(@RequestBody @Valid UserDto userDto) {
+    //        int index = registerUser(userDto);
+    //        return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
+    //    }
 
     @GetMapping("/users")
     public ResponseEntity<List<UserDto>> getUser() {
-        return ResponseEntity.ok(USER_DTO_LIST);
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     public static int registerUser(UserDto userDto) {
@@ -51,19 +51,19 @@ public class UserController {
      * ======================== DATABASE ========================
      * */
 
-    @PostMapping("/db/user")
+    @PostMapping("/user")
     public ResponseEntity<String> regUserInDatabase(@RequestBody @Valid UserDto userDto) {
         Integer index = userService.regUserInDatabase(userDto);
         return ResponseEntity.created(URI.create("")).header("index", String.valueOf(index)).build();
     }
 
-    @GetMapping("/db/user/{id}")
+    @GetMapping("/user/{id}")
     public ResponseEntity<UserDto> getUserFromDatabase(@PathVariable Integer id) throws CustomException {
         UserDto userDto = userService.getUserFromDatabase(id);
         return ResponseEntity.ok(userDto);
     }
 
-    @DeleteMapping("/db/user/{id}")
+    @DeleteMapping("/user/{id}")
     public ResponseEntity<String> deleteUserFromDatabase(@PathVariable Integer id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();

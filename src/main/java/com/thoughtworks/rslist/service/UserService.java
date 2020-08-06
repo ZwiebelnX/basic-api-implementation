@@ -7,6 +7,8 @@ import com.thoughtworks.rslist.repository.UserRepo;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -18,6 +20,21 @@ public class UserService {
 
     public UserService(UserRepo userRepo) {
         this.userRepo = userRepo;
+    }
+
+    public List<UserDto> getAllUsers() {
+        List<UserDto> userDtoList = new ArrayList<>();
+        for (UserPo userPo : userRepo.findAll()) {
+            UserDto userDto = UserDto.builder()
+                .name(userPo.getName())
+                .age(userPo.getAge())
+                .gender(userPo.getGender())
+                .email(userPo.getEmail())
+                .phone(userPo.getPhone())
+                .build();
+            userDtoList.add(userDto);
+        }
+        return userDtoList;
     }
 
     public Integer regUserInDatabase(UserDto userDto) {
@@ -42,13 +59,13 @@ public class UserService {
         if (!userPOOptional.isPresent()) {
             throw new CustomException("invalid user's id");
         }
-        UserPo userPO = userPOOptional.get();
+        UserPo userPo = userPOOptional.get();
         return UserDto.builder()
-            .name(userPO.getName())
-            .age(userPO.getAge())
-            .gender(userPO.getGender())
-            .email(userPO.getEmail())
-            .phone(userPO.getPhone())
+            .name(userPo.getName())
+            .age(userPo.getAge())
+            .gender(userPo.getGender())
+            .email(userPo.getEmail())
+            .phone(userPo.getPhone())
             .build();
     }
 
