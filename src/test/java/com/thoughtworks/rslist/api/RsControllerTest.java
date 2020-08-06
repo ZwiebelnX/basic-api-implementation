@@ -83,7 +83,9 @@ public class RsControllerTest {
         mockMvc.perform(get("/rs/" + eventId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.eventName").value("猪肉涨价了"))
-            .andExpect(jsonPath("$.keyWord").value("经济"));
+            .andExpect(jsonPath("$.keyWord").value("经济"))
+            .andExpect(jsonPath("$.id").value(eventId))
+            .andExpect(jsonPath("$.voteNum").value(0));
     }
 
     @Test

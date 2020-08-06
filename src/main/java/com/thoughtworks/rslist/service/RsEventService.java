@@ -5,6 +5,7 @@ import com.thoughtworks.rslist.model.dto.RsEventDto;
 import com.thoughtworks.rslist.model.dto.VoteDto;
 import com.thoughtworks.rslist.model.po.RsEventPo;
 import com.thoughtworks.rslist.model.po.UserPo;
+import com.thoughtworks.rslist.model.po.VotePo;
 import com.thoughtworks.rslist.repository.RsEventRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,16 @@ public class RsEventService {
             throw new CustomException("invalid index");
         }
         RsEventPo rsEventPo = rsEventPoOptional.get();
-        return RsEventDto.builder().eventName(rsEventPo.getEventName()).keyWord(rsEventPo.getKeyWord()).build();
+        int voteNum = 0;
+        for (VotePo votePo : rsEventPo.getVotePoList()) {
+            voteNum += votePo.getVoteNum();
+        }
+        return RsEventDto.builder()
+            .eventName(rsEventPo.getEventName())
+            .keyWord(rsEventPo.getKeyWord())
+            .id(rsEventPo.getId())
+            .voteNum(voteNum)
+            .build();
     }
 
     public Integer createRsEvent(RsEventDto rsEventDto) throws CustomException {

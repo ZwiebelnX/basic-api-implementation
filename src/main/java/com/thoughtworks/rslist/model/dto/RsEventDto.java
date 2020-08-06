@@ -22,9 +22,19 @@ public class RsEventDto {
     @NotEmpty
     private String keyWord;
 
+    private Integer voteNum;
+
+    private Integer id;
+
     @Valid
     @NotNull
     private Integer userId;
+
+    public RsEventDto(String eventName, String keyWord, Integer userId) {
+        this.eventName = eventName;
+        this.keyWord = keyWord;
+        this.userId = userId;
+    }
 
     public String getEventName() {
         return eventName;
@@ -52,4 +62,19 @@ public class RsEventDto {
         this.userId = userId;
     }
 
+    public Integer getVoteNum() {
+        return voteNum;
+    }
+
+    public void setVoteNum(Integer voteNum) {
+        this.voteNum = voteNum;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }
