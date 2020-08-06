@@ -18,8 +18,11 @@ public class RsEventService {
 
     private final RsEventRepo rsEventRepo;
 
-    public RsEventService(RsEventRepo rsEventRepo) {
+    private final UserService userService;
+
+    public RsEventService(RsEventRepo rsEventRepo, UserService userService) {
         this.rsEventRepo = rsEventRepo;
+        this.userService = userService;
     }
 
     public List<RsEventDto> getList(Integer start, Integer end) {
@@ -46,7 +49,10 @@ public class RsEventService {
         return RsEventDto.builder().eventName(rsEventPo.getEventName()).keyWord(rsEventPo.getKeyWord()).build();
     }
 
-    public Integer createRsEvent(RsEventDto rsEventDto) {
+    public Integer createRsEvent(RsEventDto rsEventDto) throws CustomException {
+        if (!userService.isCheckUserIdExist(rsEventDto.getUserId())) {
+            throw new CustomException("user not exist");
+        }
         RsEventPo rsEventPo = RsEventPo.builder().eventName(rsEventDto.getEventName()).keyWord(rsEventDto.getKeyWord()).build();
         rsEventRepo.save(rsEventPo);
         return rsEventPo.getId();

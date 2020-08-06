@@ -34,13 +34,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    public static int registerUser(UserDto userDto) {
-        if (!USER_DTO_LIST.contains(userDto)) {
-            USER_DTO_LIST.add(userDto);
-        }
-        return USER_DTO_LIST.indexOf(userDto);
-    }
-
     @PostMapping("/user")
     public ResponseEntity<String> regUserInDatabase(@RequestBody @Valid UserDto userDto) {
         Integer index = userService.regUserInDatabase(userDto);

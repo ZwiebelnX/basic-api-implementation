@@ -53,7 +53,7 @@ public class RsController {
     }
 
     @PostMapping("rs/event")
-    public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEventDto rsEventDto) {
+    public ResponseEntity<String> addOneRsEvent(@RequestBody @Valid RsEventDto rsEventDto) throws CustomException {
         Integer id = rsEventService.createRsEvent(rsEventDto);
         return ResponseEntity.created(URI.create("")).header("index", String.valueOf(id)).build();
     }

@@ -40,8 +40,6 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
-        RsController.initAll();
-
         userRepo.deleteAll();
     }
 

@@ -24,7 +24,7 @@ public class RsEventDto {
 
     @Valid
     @NotNull
-    private UserDto userDto;
+    private Integer userId;
 
     public String getEventName() {
         return eventName;
@@ -43,13 +43,13 @@ public class RsEventDto {
     }
 
     @JsonIgnore
-    public UserDto getUserDto() {
-        return userDto;
+    public Integer getUserId() {
+        return userId;
     }
 
     @JsonProperty
-    public void setUserDto(UserDto userDto) {
-        this.userDto = userDto;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
 }

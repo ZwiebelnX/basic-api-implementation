@@ -73,4 +73,8 @@ public class UserService {
     public void deleteUser(Integer id) {
         userRepo.deleteById(id);
     }
+
+    public boolean isCheckUserIdExist(Integer userId) {
+        return userRepo.existsById(userId);
+    }
 }

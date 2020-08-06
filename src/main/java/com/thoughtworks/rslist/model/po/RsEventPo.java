@@ -29,4 +29,7 @@ public class RsEventPo {
     @Column(length = 100)
     private String keyWord;
 
+    @Column
+    private Integer userId;
+
 }

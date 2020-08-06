@@ -2,13 +2,22 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.model.dto.RsEventDto;
+import com.thoughtworks.rslist.model.dto.UserDto;
 import com.thoughtworks.rslist.repository.RsEventRepo;
+import com.thoughtworks.rslist.repository.UserRepo;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -22,6 +31,9 @@ public class RsControllerTest {
     @Autowired
     private RsEventRepo rsEventRepo;
 
+    @Autowired
+    private UserRepo userRepo;
+
     RsControllerTest() {
         objectMapper = new ObjectMapper();
         objectMapper.configure(MapperFeature.USE_ANNOTATIONS, false);
@@ -29,8 +41,36 @@ public class RsControllerTest {
 
     @BeforeEach
     public void setUp() {
+        userRepo.deleteAll();
         rsEventRepo.deleteAll();
     }
+
+    @Test
+    public void should_add_event_when_post_event_given_correct_info() throws Exception {
+        String userId = create_one_user();
+        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", "经济", Integer.parseInt(userId));
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
+        mockMvc.perform(post("/rs/event").contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isCreated());
+        assertEquals(1, rsEventRepo.findAll().size());
+    }
+
+    @Test
+    public void should_throw_error_when_post_event_given_dont_exist_user_id() throws Exception {
+        RsEventDto rsEventDto = new RsEventDto("猪肉涨价了", "经济", -1);
+        String requestBody = objectMapper.writeValueAsString(rsEventDto);
+        mockMvc.perform(post("/rs/event").contentType(MediaType.APPLICATION_JSON).content(requestBody)).andExpect(status().isBadRequest());
+    }
+
+    private String create_one_user() throws Exception {
+        UserDto userDto = new UserDto("onion", "male", 22, "onion@thoughtworks.com", "18100000000");
+        String requestBody = objectMapper.writeValueAsString(userDto);
+        return mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("index");
+    }
+
     //
     //    @Test
     //    public void should_get_all_rs_event_when_get_rs_list() throws Exception {
