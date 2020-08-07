@@ -11,7 +11,6 @@ import com.thoughtworks.rslist.repository.RsEventRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +18,16 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-@Service
 public class RsEventService {
 
-    private final RsEventRepo rsEventRepo;
+    private RsEventRepo rsEventRepo;
 
     private UserService userService;
 
     private VoteService voteService;
 
-    public RsEventService(RsEventRepo rsEventRepo) {
+    @Autowired
+    public void setRsEventRepo(RsEventRepo rsEventRepo) {
         this.rsEventRepo = rsEventRepo;
     }
 
